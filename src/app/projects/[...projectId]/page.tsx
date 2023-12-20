@@ -1,8 +1,8 @@
 import { fetchProjects } from '@/utils/mongodb';
 import type { ProjectParams } from "@/utils/types"
 import { Container, Row, Col } from 'react-bootstrap';
-import Toolbar from '@/components/Toolbar';
-import ViewContainer from '@/components/ViewContainer';
+import Toolbar from '@/components/toolbars/Toolbar';
+import ViewContainer from '@/components/containers/ViewContainer';
 
 export default async function Project({ params }: { params: ProjectParams }) {
     const project = await fetchProjects(params.projectId[0]);

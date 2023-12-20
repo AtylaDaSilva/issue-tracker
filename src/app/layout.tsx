@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import '@/css/bootstrap/bootstrap.css';
 import '@/css/globals.css';
 
-import Sidebar from '@/components/Sidebar';
+import Sidebar from '@/components/toolbars/Sidebar';
 
 export const metadata: Metadata = {
   title: 'Issue Tracker',

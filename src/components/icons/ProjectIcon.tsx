@@ -1,7 +1,6 @@
-import type { ProjectParams } from "@/utils/types";
 import Link from "next/link";
 
-export default function ProjectIcon({ projectId, projectName}: projectParams) {
+export default function ProjectIcon({ projectId, projectName }: { projectId: string, projectName: string }) {
     return (
         <Link
             href={`/projects/${projectId}`}
