@@ -7,7 +7,7 @@ export type MongoDBConnection = {
 }
 
 export type Card = {
-    _id: ObjectId,
+    _id: string | ObjectId,
     name: string,
     priority: number | string,
     severity: number | string,
@@ -18,7 +18,7 @@ export type Card = {
 }
 
 export type Project = {
-    _id: ObjectId,
+    _id: string | ObjectId,
     name: string,
     cards: Card[]
 }

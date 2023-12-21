@@ -11,8 +11,8 @@ export default async function Sidebar() {
     const projects = data.map((project: Project) => {
         return (
             <ProjectIcon
-                key={project._id?.toString()}
-                projectId={project._id.toString()}
+                key={project._id as string}
+                projectId={project._id as string}
                 projectName={project.name}
             />
         );

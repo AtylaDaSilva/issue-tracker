@@ -4,7 +4,7 @@ import { useState } from "react"
 import type { FormModal } from "@/utils/types"
 
 export default function FormModal({ trigger, fields, modalOptions, handleSubmit }: FormModal) {
-    const [showModal, setShowModal] = useState(false)
+    const [showModal, setShowModal] = useState(false);
     trigger.props.onClick = () => setShowModal(true);
     return (
         <>
@@ -24,7 +24,10 @@ export default function FormModal({ trigger, fields, modalOptions, handleSubmit 
                         <h4>{modalOptions?.headerText || "Form Modal"}</h4>
                     </Modal.Title>
                 </Modal.Header>
-                <Form action={handleSubmit}>
+                <Form action={async (formData) => {
+                    await handleSubmit(formData);
+                    setShowModal(false);
+                }}>
                     <Modal.Body>
                         {fields.map((input) => input)}
                     </Modal.Body>

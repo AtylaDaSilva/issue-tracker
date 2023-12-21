@@ -19,7 +19,7 @@ export default function TableView({ cards }: { cards: Cards }) {
                 {
                     cards.map(card => {
                         return (
-                            <tr key={card._id.toString()}>
+                            <tr key={card._id as string}>
                                 <td>{card.name}</td>
                                 <td>{card.priority}</td>
                                 <td>{card.severity}</td>
