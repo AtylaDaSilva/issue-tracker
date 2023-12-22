@@ -1,5 +1,4 @@
 import { ObjectId, MongoClient } from 'mongodb';
-import { FunctionComponent } from 'react';
 
 export type MongoDBConnection = {
     client: MongoClient | null,
@@ -8,6 +7,7 @@ export type MongoDBConnection = {
 
 export type Card = {
     _id: string | ObjectId,
+    project_id: string | ObjectId,
     name: string,
     priority: number | string,
     severity: number | string,
@@ -19,8 +19,7 @@ export type Card = {
 
 export type Project = {
     _id: string | ObjectId,
-    name: string,
-    cards: Card[]
+    name: string
 }
 
 export type FormModal = {
@@ -30,8 +29,19 @@ export type FormModal = {
     modalOptions?: {
         size?: "sm" | "lg" | "xl"
         centered?: boolean,
-        modalTitle?: string,
         headerText?: string,
         footerButttonText?: string
+    }
+}
+
+export type ConfirmModal = {
+    trigger: JSX.Element,
+    message: string,
+    params?: any,
+    handleSubmit: (params: any | undefined) => Promise<void>,
+    modalOptions?: {
+        size?: "sm" | "lg" | "xl",
+        centered?: boolean,
+        modalTitle?: string
     }
 }

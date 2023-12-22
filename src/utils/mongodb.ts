@@ -1,7 +1,8 @@
 "use server"
 import { MongoClient, ObjectId } from "mongodb";
-import type { MongoDBConnection, Project } from "./types";
+import type { MongoDBConnection, Project, Card } from "./types";
 import { redirect, RedirectType } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 const MONGODB_URI = process.env.MONGODB_URI;
 const MONGODB = process.env.MONGODB;
@@ -22,7 +23,7 @@ async function connectToDatabase() {
     return conn;
 }
 
-function serialize(mongoQueryResult: Array<any>, fields: Array<string> | undefined = ["_id"]) : any {
+function serialize(mongoQueryResult: Array<any>, fields: Array<string> | undefined = ["_id"]): any {
     try {
         return mongoQueryResult.map((document) => {
             let aux = new Map();
@@ -45,7 +46,7 @@ export async function fetchProjects(projectId?: string | null) {
     const { db } = await connectToDatabase();
     const collection = db.collection("projects");
     const data = await collection
-        .find((projectId) ? {"_id": new ObjectId(projectId)} : {})
+        .find((projectId) ? { "_id": new ObjectId(projectId) } : {})
         .limit(QUERY_RESULT_LIMIT)
         .toArray()
     return serialize(data);
@@ -76,8 +77,7 @@ export async function addProject(formData: any) {
 
     const newProject: Project = {
         _id: new ObjectId(),
-        name: formData.get("projectName"),
-        cards: []
+        name: formData.get("projectName")
     };
 
     var success: boolean = false;
@@ -112,5 +112,46 @@ export async function deleteProject(projectId: string | ObjectId) {
         console.error(err);
     } finally {
         if (success) redirect("/", RedirectType.replace);
+    }
+}
+
+export async function addCard(formData: any) {
+    try {
+        let data = new Map();
+        for (const [key, value] of formData.entries()) {
+            data.set(
+                key,
+                (key.indexOf("_id") !== -1) ? new ObjectId(value) : value
+            );
+        }
+        const newCard : Card = Object.fromEntries(data);
+        console.log(newCard);
+
+        const { db } = await connectToDatabase();
+        await db
+            .collection('cards')
+            .insertOne(newCard)
+        revalidatePath(`/projects/${newCard.project_id}`);
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+export async function deleteCard(cardId: string | ObjectId) {
+    try {
+        if (!cardId) throw new Error("Error while deleting card: Missing card id");
+        const query = {
+            "_id": (cardId instanceof ObjectId) ? cardId : new ObjectId(cardId)
+        };
+        const { db } = await connectToDatabase();
+        const card : Card = await db
+            .collection('cards')
+            .findOne(query);
+        await db
+            .collection('cards')
+            .deleteOne(query)
+        revalidatePath(`/projects/${card.project_id}`)
+    } catch (err) {
+        console.error(err);
     }
 }
