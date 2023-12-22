@@ -1,7 +1,7 @@
-import type { Cards } from "@/utils/types";
+import type { Card } from "@/utils/types";
 import { Table } from "react-bootstrap"
 
-export default function TableView({ cards }: { cards: Cards }) {
+export default function TableView({ cards }: { cards: Card[] }) {
     return (
         <Table hover>
             <thead>

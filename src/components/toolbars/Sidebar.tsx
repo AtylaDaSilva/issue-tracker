@@ -7,7 +7,7 @@ import FormModal from '../modals/FormModal';
 import { Button, Form, FloatingLabel } from 'react-bootstrap';
 
 export default async function Sidebar() {
-    const data = await fetchProjects();
+    const data: Project[] = await fetchProjects();
     const projects = data.map((project: Project) => {
         return (
             <ProjectIcon

@@ -5,7 +5,7 @@ import { redirect, RedirectType } from "next/navigation";
 
 const MONGODB_URI = process.env.MONGODB_URI;
 const MONGODB = process.env.MONGODB;
-const QUERY_RESULT_LIMIT = process.env.QUERY_RESULT_LIMIT;
+const QUERY_RESULT_LIMIT = parseInt(process.env.QUERY_RESULT_LIMIT);
 
 if (!MONGODB_URI || !MONGODB || !QUERY_RESULT_LIMIT) {
     throw new Error("Missing/Invalid MongoDB variable(s) in .env.local");
@@ -13,7 +13,7 @@ if (!MONGODB_URI || !MONGODB || !QUERY_RESULT_LIMIT) {
 
 let conn: MongoDBConnection = { client: null, db: null };
 
-export async function connectToDatabase() {
+async function connectToDatabase() {
     if (conn.client) return conn;
 
     const client = new MongoClient(MONGODB_URI);
@@ -22,29 +22,53 @@ export async function connectToDatabase() {
     return conn;
 }
 
+function serialize(mongoQueryResult: Array<any>, fields: Array<string> | undefined = ["_id"]) : any {
+    try {
+        return mongoQueryResult.map((document) => {
+            let aux = new Map();
+            for (const [key, value] of Object.entries(document)) {
+                if (fields.indexOf(key) !== -1) {
+                    let val = value as ObjectId;
+                    aux.set(key, val.toString());
+                } else {
+                    aux.set(key, value);
+                }
+            }
+            return Object.fromEntries(aux);
+        })
+    } catch (err) {
+        console.error(err);
+    }
+}
+
 export async function fetchProjects(projectId?: string | null) {
     const { db } = await connectToDatabase();
     const collection = db.collection("projects");
-    let data;
-    if (projectId) {
-        data = await collection.findOne({ _id: new ObjectId(projectId) });
-        data._id = data._id.toString();
-        for (let card of data.cards) {
-            card._id = card._id.toString();
+    const data = await collection
+        .find((projectId) ? {"_id": new ObjectId(projectId)} : {})
+        .limit(QUERY_RESULT_LIMIT)
+        .toArray()
+    return serialize(data);
+}
+
+export async function fetchCards(fetchParams: { _id?: string, project_id?: string }) {
+    try {
+        //Serialize fetchParams properties into ObjectIds
+        let queryMap = new Map();
+        for (const [key, value] of Object.entries(fetchParams)) {
+            if (value) queryMap.set(key, new ObjectId(value));
         }
-    } else {
-        data = await collection
-            .find({})
-            .limit(parseInt(QUERY_RESULT_LIMIT))
-            .toArray()
-        for (let document of data) {
-            document._id = document._id.toString();
-            for (let card of document.cards) {
-                card._id = card._id.toString();
-            }
-        }
+        const query = Object.fromEntries(queryMap);
+        const { db } = await connectToDatabase();
+        const collection = db.collection('cards');
+        const data = await collection
+            .find(query)
+            .limit(QUERY_RESULT_LIMIT)
+            .toArray();
+        return serialize(data, ["_id", "project_id"]);
+    } catch (err) {
+        console.error(err);
     }
-    return data;
 }
 
 export async function addProject(formData: any) {

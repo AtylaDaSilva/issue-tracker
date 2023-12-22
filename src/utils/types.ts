@@ -23,8 +23,6 @@ export type Project = {
     cards: Card[]
 }
 
-export type Cards = Card[];
-
 export type FormModal = {
     trigger: JSX.Element,
     fields: JSX.Element[],

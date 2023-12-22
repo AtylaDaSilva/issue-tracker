@@ -1,8 +1,9 @@
 import { fetchProjects } from '@/utils/mongodb';
 import { Button } from 'react-bootstrap';
+import type { Project } from '@/utils/types';
 
 export default async function Home() {
-  const data = await fetchProjects();
+  const data: Project[] = await fetchProjects();
   return (
     <main
       style={{width: "95vw", height: "98vh"}}
