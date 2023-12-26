@@ -1,14 +1,9 @@
 import Link from "next/link"
 
-export default function Brand() {
+export default function Brand({ href, logo, styles }: {href: string, logo: any, styles?: string}) {
     return (
-        <Link href='/' className="text-white">
-            <div
-                style={{ height: "50px", width: "50px" }}
-                className="bg-success rounded-5"
-            >
-                Brand
-            </div>
+        <Link href={href} className={styles}>
+            {logo}
         </Link>
     )
 }

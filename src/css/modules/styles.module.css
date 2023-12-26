@@ -1,0 +1,16 @@
+.brand {
+    height: 50px;
+    width: 50px;
+    background-color: var(--bg-custom);
+    border-radius: 50%;
+    font-size: var(--default-icon-size);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: whitesmoke;
+}
+
+.addProject {
+    font-size: var(--default-icon-size);
+    cursor: pointer;
+}

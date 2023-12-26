@@ -26,6 +26,10 @@ export type FormModal = {
     trigger: JSX.Element,
     fields: JSX.Element[],
     handleSubmit: (formData: any) => Promise<any>,
+    triggerOptions?: {
+        styles?: string,
+        tooltip?: { title: string, placement: "top" | "bottom" | "left" | "right"}
+    }
     modalOptions?: {
         size?: "sm" | "lg" | "xl"
         centered?: boolean,

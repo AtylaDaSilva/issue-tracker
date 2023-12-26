@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import '@/css/bootstrap/bootstrap.css';
+import 'bootstrap-icons/font/bootstrap-icons.min.css';
 import '@/css/globals.css';
 
 import Sidebar from '@/components/toolbars/Sidebar';
@@ -16,7 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className='vh-100 vw-100 d-flex flex-row' data-bs-theme='dark'>
+      <body data-bs-theme='dark'>
         <Sidebar />
         {children}
       </body>

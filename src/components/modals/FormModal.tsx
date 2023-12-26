@@ -1,14 +1,30 @@
 'use client'
-import { Modal, Button, Form } from "react-bootstrap"
+import { Modal, Button, Form, OverlayTrigger, Tooltip } from "react-bootstrap"
 import { useState } from "react"
 import type { FormModal } from "@/utils/types"
+import { nanoid } from "nanoid"
 
-export default function FormModal({ trigger, fields, modalOptions, handleSubmit }: FormModal) {
+export default function FormModal({ trigger, fields, triggerOptions, modalOptions, handleSubmit }: FormModal) {
     const [showModal, setShowModal] = useState(false);
+    const TooltipOverlay = ({ id, children, title, placement }: { id: string, children: any, title: string, placement: "top" | "bottom" | "left" | "right" }) => {
+        return (
+            <OverlayTrigger
+                overlay={<Tooltip id={id}>{title}</Tooltip>}
+                placement={placement}
+            >
+                {children}
+            </OverlayTrigger>
+        );
+    }
+    trigger.props.className = `${trigger.props.className} ${triggerOptions?.styles}`;
     trigger.props.onClick = () => setShowModal(true);
     return (
         <>
-            {trigger}
+            {
+                triggerOptions?.tooltip !== undefined
+                    ? <TooltipOverlay id={nanoid()} placement={triggerOptions?.tooltip?.placement} title={triggerOptions.tooltip.title}>{trigger}</TooltipOverlay>
+                    : trigger
+            }
             <Modal
                 show={showModal}
                 size={modalOptions?.size || "lg"}

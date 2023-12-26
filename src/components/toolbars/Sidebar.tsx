@@ -4,7 +4,8 @@ import Brand from '../icons/Brand';
 import ProjectIcon from '../icons/ProjectIcon';
 import Avatar from '../icons/Avatar';
 import FormModal from '../modals/FormModal';
-import { Button, Form, FloatingLabel } from 'react-bootstrap';
+import { Form, FloatingLabel } from 'react-bootstrap';
+import styles from "@/css/modules/styles.module.css";
 
 export default async function Sidebar() {
     const data: Project[] = await fetchProjects();
@@ -27,13 +28,18 @@ export default async function Sidebar() {
             style={{ width: "70px" }}
             className="d-flex flex-column align-items-center p-2"
         >
-            <Brand />
-            <hr className='text-success w-75' />
+            <Brand
+                href="/"
+                styles={styles.brand}
+                logo={<i id='brand' className="bi bi-bug-fill" />}
+            />
+            <hr className='w-75' />
             <div className='d-flex flex-column align-items-center'>
                 <FormModal
-                    trigger={<Button variant='success' className='mb-2'>+</Button>}
+                    trigger={<i className="bi bi-file-earmark-plus-fill"></i>}
                     handleSubmit={addProject}
                     fields={formFields}
+                    triggerOptions={{styles: styles.addProject, tooltip: {title: "Add Project", placement: "right"}}}
                     modalOptions={{
                         size: "sm",
                         headerText: "New Project",

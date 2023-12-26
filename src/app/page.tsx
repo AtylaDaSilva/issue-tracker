@@ -6,8 +6,7 @@ export default async function Home() {
   const data: Project[] = await fetchProjects();
   return (
     <main
-      style={{width: "95vw", height: "98vh"}}
-      className=' bg-danger rounded-3 m-auto d-flex justify-content-center align-items-center'
+      className='rounded-3 m-auto d-flex justify-content-center align-items-center flex-grow-1'
     >
       {
         (data.length > 0)
