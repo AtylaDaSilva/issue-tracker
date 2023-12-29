@@ -13,4 +13,68 @@
 .addProject {
     font-size: var(--default-icon-size);
     cursor: pointer;
+    color: var(--bs-white);
+    transition: color var(--default-transition-time);
+}
+
+.addProject:hover {
+    color: var(--bs-success);
+    transition: color var(--default-transition-time);
+}
+
+.deleteProject {
+    font-size: var(--default-icon-size);
+    color: var(--bs-white);
+    transition: color var(--default-transition-time);
+    cursor: pointer;
+}
+
+.deleteProject:hover {
+    color: var(--bs-danger);
+    transition: color var(--default-transition-time);
+}
+
+.projectIcon {
+    height: 50px;
+    width: 50px;
+    display: flex;
+    justify-content: center;
+    font-size: var(--default-icon-size);
+    color: var(--bs-white);
+    align-items: center;
+    border-radius: 50%;
+    background-color: var(--bs-primary);
+    margin: 8px 0px;
+}
+
+.Avatar {
+    cursor: pointer;
+    height: 50px;
+    width: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    background-color: var(--bg-custom);
+    font-size: 2rem;
+    padding-bottom: 5px;
+    color: var(--bs-white);
+}
+
+.projectNameContainer {
+    width: 300px;
+    height: 46px;
+    overflow: hidden;
+}
+
+.addCard {
+    font-size: var(--default-icon-size);
+    color: var(--bs-white);
+    cursor: pointer;
+    transition: color var(--default-transition-time);
+}
+
+.addCard:hover {
+    color: var(--bs-success);
+    transition: color var(--default-transition-time);
 }

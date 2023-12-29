@@ -101,12 +101,14 @@ export async function deleteProject(projectId: string | ObjectId) {
     var success: boolean = false;
     try {
         const { db } = await connectToDatabase();
-        const collection = db.collection('projects');
-        await collection.deleteOne({
-            "_id": (projectId instanceof ObjectId)
-                ? projectId
-                : new ObjectId(projectId)
-        });
+        await deleteAllCards();
+        await db
+            .collection('projects')
+            .deleteOne({
+                "_id": (projectId instanceof ObjectId)
+                    ? projectId
+                    : new ObjectId(projectId)
+            });
         success = true;
     } catch (err) {
         console.error(err);
@@ -124,9 +126,7 @@ export async function addCard(formData: any) {
                 (key.indexOf("_id") !== -1) ? new ObjectId(value) : value
             );
         }
-        const newCard : Card = Object.fromEntries(data);
-        console.log(newCard);
-
+        const newCard: Card = Object.fromEntries(data);
         const { db } = await connectToDatabase();
         await db
             .collection('cards')
@@ -144,13 +144,26 @@ export async function deleteCard(cardId: string | ObjectId) {
             "_id": (cardId instanceof ObjectId) ? cardId : new ObjectId(cardId)
         };
         const { db } = await connectToDatabase();
-        const card : Card = await db
+        const card: Card = await db
             .collection('cards')
             .findOne(query);
         await db
             .collection('cards')
             .deleteOne(query)
         revalidatePath(`/projects/${card.project_id}`)
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+/**Deletes ALL cards from database. This function should NOT be exported */
+async function deleteAllCards() {
+    try {
+        const { db } = await connectToDatabase();
+        return await (db
+            .collection("cards")
+            .deleteMany({}));
+
     } catch (err) {
         console.error(err);
     }

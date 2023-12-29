@@ -8,7 +8,7 @@ export default async function Project({ params }: { params: {projectId: string} 
     const project: Project[] = await fetchProjects(params.projectId[0]);
     const cards: Card[] = await fetchCards({ project_id: params.projectId[0] });
     return (
-        <Container fluid className='h-100 d-flex flex-column'>
+        <Container fluid className='main-container d-flex flex-column'>
             <Row>
                 <Col>
                     {<Toolbar project={project[0]} />}

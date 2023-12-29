@@ -22,13 +22,20 @@ export type Project = {
     name: string
 }
 
+export type TooltipType = {
+    id?: string,
+    placement: "top" | "bottom" | "left" | "right",
+    title: string,
+    children?: any
+}
+
 export type FormModal = {
     trigger: JSX.Element,
     fields: JSX.Element[],
     handleSubmit: (formData: any) => Promise<any>,
     triggerOptions?: {
         styles?: string,
-        tooltip?: { title: string, placement: "top" | "bottom" | "left" | "right"}
+        tooltip?: TooltipType
     }
     modalOptions?: {
         size?: "sm" | "lg" | "xl"
@@ -43,9 +50,24 @@ export type ConfirmModal = {
     message: string,
     params?: any,
     handleSubmit: (params: any | undefined) => Promise<void>,
+    triggerOptions?: {
+        styles?: string,
+        tooltip?: TooltipType
+    },
     modalOptions?: {
         size?: "sm" | "lg" | "xl",
         centered?: boolean,
         modalTitle?: string
     }
+}
+
+export type ProjectIcon = {
+    projectId: string,
+    styles: string,
+    icon: JSX.Element,
+    tooltipOptions?: TooltipType
+}
+
+export type Avatar = {
+    styles?: string
 }

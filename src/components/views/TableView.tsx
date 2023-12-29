@@ -1,6 +1,7 @@
 import { deleteCard } from "@/utils/mongodb";
 import type { Card } from "@/utils/types";
-import { Table, Button } from "react-bootstrap"
+import { formatDate } from "@/utils/functions";
+import { Table } from "react-bootstrap"
 import ConfirmModal from "../modals/ConfirmModal";
 
 export default function TableView({ cards }: { cards: Card[] }) {
@@ -9,7 +10,7 @@ export default function TableView({ cards }: { cards: Card[] }) {
             <thead>
                 <tr>
                     <th>Name</th>
-                    <th>Delete</th>
+                    <th><i className="bi bi-trash3 fs-5"></i></th>
                     <th>Priority</th>
                     <th>Severity</th>
                     <th>List</th>
@@ -26,8 +27,11 @@ export default function TableView({ cards }: { cards: Card[] }) {
                                 <td>{card.name}</td>
                                 <td>
                                     <ConfirmModal
-                                        trigger={<Button variant="danger">Delete</Button>}
-                                        message="Are you sure you want to delete this card?"
+                                        trigger={<i className="bi bi-trash3 fs-5 text-danger clickable"></i>}
+                                        triggerOptions={{
+                                            tooltip: {title: `Delete '${card.name}'`, placement: "left"}
+                                        }}
+                                        message="Are you sure you want to delete this card? This process can not be undone."
                                         params={card._id}
                                         handleSubmit={deleteCard}
                                         modalOptions={{ centered: true, modalTitle: "Delete Card" }}
@@ -38,7 +42,7 @@ export default function TableView({ cards }: { cards: Card[] }) {
                                 <td>{card.list}</td>
                                 <td>{card.labels}</td>
                                 <td>{card.members}</td>
-                                <td>{card.due_date}</td>
+                                <td>{formatDate(card.due_date)}</td>
                             </tr>
                         )
                     })

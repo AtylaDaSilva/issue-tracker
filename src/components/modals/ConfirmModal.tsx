@@ -1,14 +1,21 @@
 'use client'
 import type { ConfirmModal } from "@/utils/types";
-import { Modal, Button, Form } from "react-bootstrap"
+import BSTooltipOverlay from "../tooltips/BSTooltip";
+import { Modal, Button } from "react-bootstrap"
 import { useState } from "react"
+import { nanoid } from "nanoid";
 
-export default function ConfirmModal({ trigger, message, params, modalOptions, handleSubmit }: ConfirmModal) {
+export default function ConfirmModal({ trigger, message, params, triggerOptions, modalOptions, handleSubmit }: ConfirmModal) {
     const [showModal, setShowModal] = useState(false);
     trigger.props.onClick = () => setShowModal(true);
+    trigger.props.className = `${trigger.props.className} ${triggerOptions?.styles}`
     return (
         <>
-            {trigger}
+            {
+                triggerOptions?.tooltip !== undefined
+                    ? <BSTooltipOverlay id={nanoid()} title={triggerOptions.tooltip.title} placement={triggerOptions.tooltip.placement}>{trigger}</BSTooltipOverlay>
+                    : trigger
+            }
             <Modal
                 show={showModal}
                 size={modalOptions?.size || "sm"}

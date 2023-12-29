@@ -1,8 +1,9 @@
 import { deleteProject, addCard } from "@/utils/mongodb"
 import type { Project } from "@/utils/types"
-import { Container, Button, Form, FloatingLabel } from "react-bootstrap"
+import { Container, Button, Form, FloatingLabel, Tooltip } from "react-bootstrap"
 import FormModal from "../modals/FormModal"
 import ConfirmModal from "../modals/ConfirmModal"
+import styles from "@/css/modules/styles.module.css";
 
 export default function Toolbar({ project }: { project: Project }) {
     const formFields: JSX.Element[] = [
@@ -17,13 +18,13 @@ export default function Toolbar({ project }: { project: Project }) {
             label="Priority"
             controlId="priorityInput"
         >
-            <Form.Control name="priority" type="number" required placeholder="Priority" />
+            <Form.Control name="priority" type="number" min={1} max={5} required placeholder="Priority" />
         </FloatingLabel>,
         <FloatingLabel
             label="Severity"
             controlId="severityInput"
         >
-            <Form.Control name="severity" type="number" required placeholder="Severity" />
+            <Form.Control name="severity" type="number" min={1} max={5} required placeholder="Severity" />
         </FloatingLabel>,
         <FloatingLabel
             label="List"
@@ -52,19 +53,31 @@ export default function Toolbar({ project }: { project: Project }) {
     ];
     return (
         <Container fluid className="d-flex align-items-center justify-content-start">
-            <h1>{project.name}</h1>
-            <FormModal
-                trigger={<Button variant="success">Add Card</Button>}
-                fields={formFields}
-                handleSubmit={addCard}
-            />
-            <ConfirmModal
-                trigger={<Button>Delete Project</Button>}
-                message="Are you sure you want to delete this project?"
-                params={project._id}
-                modalOptions={{ centered: false, modalTitle: "Delete Project" }}
-                handleSubmit={deleteProject}
-            />
+            <div className={styles.projectNameContainer}>
+                <h1 className="fs-2">{project.name}</h1>
+            </div>
+            <div className="d-flex w-100 align-items-center justify-content-start">
+                <FormModal
+                    trigger={<i className="bi bi-file-earmark-plus-fill mb-1 mx-1"></i>}
+                    triggerOptions={{
+                        styles: styles.addCard,
+                        tooltip: { title: "Add Card", placement: "bottom" }
+                    }}
+                    fields={formFields}
+                    handleSubmit={addCard}
+                />
+                <ConfirmModal
+                    trigger={<i className="bi bi-folder-x mb-1 mx-1"></i>}
+                    triggerOptions={{
+                        styles: styles.deleteProject,
+                        tooltip: {title: "Delete Project", placement: "bottom"}
+                    }}
+                    message="Are you sure you want to delete this project and all of its cards? This process can not be undone."
+                    params={project._id}
+                    modalOptions={{ centered: false, modalTitle: "Delete Project" }}
+                    handleSubmit={deleteProject}
+                />
+            </div>
         </Container>
     )
 }

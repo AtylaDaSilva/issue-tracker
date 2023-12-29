@@ -1,6 +1,7 @@
 :root {
     --bg-custom: #373e44;
     --default-icon-size: 1.5rem;
+    --default-transition-time: .2s;
 }
 
 body {
@@ -12,7 +13,14 @@ body {
     padding-right: 20px;
 }
 
-main {
+.main-container {
     background-color: var(--bg-custom);
     height: 95%;
+    border-radius: 15px;
+    margin: auto;
+
+}
+
+.clickable {
+    cursor: pointer;
 }

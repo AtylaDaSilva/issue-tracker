@@ -14,7 +14,9 @@ export default async function Sidebar() {
             <ProjectIcon
                 key={project._id as string}
                 projectId={project._id as string}
-                projectName={project.name}
+                icon={<i className="bi bi-folder-fill"></i>}
+                styles={styles.projectIcon}
+                tooltipOptions={{placement: "right", title: project.name}}
             />
         );
     });
@@ -26,7 +28,7 @@ export default async function Sidebar() {
     return (
         <nav
             style={{ width: "70px" }}
-            className="d-flex flex-column align-items-center p-2"
+            className="d-flex flex-column align-items-center py-2"
         >
             <Brand
                 href="/"
@@ -36,7 +38,7 @@ export default async function Sidebar() {
             <hr className='w-75' />
             <div className='d-flex flex-column align-items-center'>
                 <FormModal
-                    trigger={<i className="bi bi-file-earmark-plus-fill"></i>}
+                    trigger={<i className="bi bi-folder-plus mb-1"></i>}
                     handleSubmit={addProject}
                     fields={formFields}
                     triggerOptions={{styles: styles.addProject, tooltip: {title: "Add Project", placement: "right"}}}
@@ -49,7 +51,7 @@ export default async function Sidebar() {
                 {projects}
             </div>
             <div className='mt-auto'>
-                <Avatar />
+                <Avatar styles={styles.Avatar} />
             </div>
         </nav>
     )
