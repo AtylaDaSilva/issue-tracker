@@ -1,6 +1,6 @@
 import { deleteProject, addCard } from "@/utils/mongodb"
 import type { Project } from "@/utils/types"
-import { Container, Button, Form, FloatingLabel, Tooltip } from "react-bootstrap"
+import { Container, Form, FloatingLabel } from "react-bootstrap"
 import FormModal from "../modals/FormModal"
 import ConfirmModal from "../modals/ConfirmModal"
 import styles from "@/css/modules/styles.module.css";
@@ -8,6 +8,7 @@ import styles from "@/css/modules/styles.module.css";
 export default function Toolbar({ project }: { project: Project }) {
     const formFields: JSX.Element[] = [
         <Form.Control name="project_id" type="text" required placeholder="projectId" hidden value={project._id as string} />,
+        <Form.Control name="user_id" type="text" required placeholder="userId" hidden value={project.user_id as string} />,
         <FloatingLabel
             label="Card Name"
             controlId="cardNameInput"

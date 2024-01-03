@@ -1,7 +1,7 @@
 'use client'
 import { Modal, Button, Form } from "react-bootstrap"
 import { useState } from "react"
-import BSTooltipOverlay from "../tooltips/BSTooltip"
+import BSTooltip from "../tooltips/BSTooltip"
 import type { FormModal } from "@/utils/types"
 import { nanoid } from "nanoid"
 
@@ -13,7 +13,7 @@ export default function FormModal({ trigger, fields, triggerOptions, modalOption
         <>
             {
                 triggerOptions?.tooltip !== undefined
-                    ? <BSTooltipOverlay id={nanoid()} placement={triggerOptions?.tooltip?.placement} title={triggerOptions.tooltip.title}>{trigger}</BSTooltipOverlay>
+                    ? <BSTooltip id={nanoid()} placement={triggerOptions?.tooltip?.placement} title={triggerOptions.tooltip.title}>{trigger}</BSTooltip>
                     : trigger
             }
             <Modal

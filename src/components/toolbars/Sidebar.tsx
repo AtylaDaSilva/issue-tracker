@@ -1,4 +1,4 @@
-import { addProject, fetchProjects } from '@/utils/mongodb';
+import { addProject, fetchProjects, getSession, fetchUserByEmail } from '@/utils/mongodb';
 import type { Project } from '@/utils/types';
 import Brand from '../icons/Brand';
 import ProjectIcon from '../icons/ProjectIcon';
@@ -8,7 +8,9 @@ import { Form, FloatingLabel } from 'react-bootstrap';
 import styles from "@/css/modules/styles.module.css";
 
 export default async function Sidebar() {
-    const data: Project[] = await fetchProjects();
+    const session = await getSession();
+    const user = await fetchUserByEmail(session?.user?.email as string);
+    const data: Project[] = await fetchProjects(user._id);
     const projects = data.map((project: Project) => {
         return (
             <ProjectIcon
@@ -21,6 +23,8 @@ export default async function Sidebar() {
         );
     });
     const formFields: JSX.Element[] = [
+        <input type="text" name='email' value={session?.user?.email as string} hidden/>,
+        <input type="text" name='username' value={session?.user?.name as string} hidden />,
         <FloatingLabel className='my-2' controlId='add-project-lable' label='Project Name'>
             <Form.Control name='projectName' type='text' placeholder='Project Name' />
         </FloatingLabel>
@@ -51,7 +55,7 @@ export default async function Sidebar() {
                 {projects}
             </div>
             <div className='mt-auto'>
-                <Avatar styles={styles.Avatar} />
+                <Avatar user={session?.user} styles={styles.Avatar} />
             </div>
         </nav>
     )

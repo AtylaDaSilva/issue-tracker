@@ -19,7 +19,8 @@ export type Card = {
 
 export type Project = {
     _id: string | ObjectId,
-    name: string
+    name: string,
+    user_id: string | ObjectId
 }
 
 export type TooltipType = {
@@ -27,6 +28,16 @@ export type TooltipType = {
     placement: "top" | "bottom" | "left" | "right",
     title: string,
     children?: any
+}
+
+export type PopoverType = {
+    trigger: JSX.Element,
+    header?: JSX.Element | string | null,
+    body: JSX.Element,
+    options: {
+        triggerBehaviour: 'hover' | 'click',
+        placement: 'auto-start' | 'auto' | 'auto-end' | 'top-start' | 'top' | 'top-end' | 'right-start' | 'right' | 'right-end' | 'bottom-end' | 'bottom' | 'bottom-start' | 'left-end' | 'left' | 'left-start'
+    }
 }
 
 export type FormModal = {
@@ -69,5 +80,10 @@ export type ProjectIcon = {
 }
 
 export type Avatar = {
+    user?: {
+        name?: string | null
+        email?: string | null
+        image?: string | null
+    },
     styles?: string
 }

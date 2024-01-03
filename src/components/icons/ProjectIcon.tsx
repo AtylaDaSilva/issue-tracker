@@ -1,5 +1,5 @@
 import Link from "next/link";
-import BSTooltipOverlay from "../tooltips/BSTooltip";
+import BSTooltip from "../tooltips/BSTooltip";
 import type { ProjectIcon } from "@/utils/types";
 
 import { nanoid } from "nanoid";
@@ -10,7 +10,7 @@ export default function ProjectIcon({ projectId, styles, icon, tooltipOptions }:
         <>
             {
                 tooltipOptions !== undefined
-                    ? <BSTooltipOverlay
+                    ? <BSTooltip
                         id={nanoid()}
                         placement={tooltipOptions.placement}
                         title={tooltipOptions.title}
@@ -21,7 +21,7 @@ export default function ProjectIcon({ projectId, styles, icon, tooltipOptions }:
                         >
                             {icon}
                         </Link>
-                    </BSTooltipOverlay>
+                    </BSTooltip>
                     : <Link
                         href={`/projects/${projectId}`}
                         className={styles}

@@ -3,6 +3,8 @@ import { MongoClient, ObjectId } from "mongodb";
 import type { MongoDBConnection, Project, Card } from "./types";
 import { redirect, RedirectType } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 
 const MONGODB_URI = process.env.MONGODB_URI;
 const MONGODB = process.env.MONGODB;
@@ -23,12 +25,12 @@ async function connectToDatabase() {
     return conn;
 }
 
-function serialize(mongoQueryResult: Array<any>, fields: Array<string> | undefined = ["_id"]): any {
+function serialize(mongoQueryResult: Array<any>): any {
     try {
         return mongoQueryResult.map((document) => {
             let aux = new Map();
             for (const [key, value] of Object.entries(document)) {
-                if (fields.indexOf(key) !== -1) {
+                if (key.indexOf("_id") !== -1) {
                     let val = value as ObjectId;
                     aux.set(key, val.toString());
                 } else {
@@ -38,46 +40,38 @@ function serialize(mongoQueryResult: Array<any>, fields: Array<string> | undefin
             return Object.fromEntries(aux);
         })
     } catch (err) {
-        console.error(err);
+        console.error("Error while serializing data: ", err);
     }
 }
 
-export async function fetchProjects(projectId?: string | null) {
-    const { db } = await connectToDatabase();
-    const collection = db.collection("projects");
-    const data = await collection
-        .find((projectId) ? { "_id": new ObjectId(projectId) } : {})
-        .limit(QUERY_RESULT_LIMIT)
-        .toArray()
-    return serialize(data);
-}
-
-export async function fetchCards(fetchParams: { _id?: string, project_id?: string }) {
+export async function fetchProjects(userId: string | ObjectId, projectId?: string | null) {
     try {
-        //Serialize fetchParams properties into ObjectIds
-        let queryMap = new Map();
-        for (const [key, value] of Object.entries(fetchParams)) {
-            if (value) queryMap.set(key, new ObjectId(value));
-        }
-        const query = Object.fromEntries(queryMap);
+        if (!userId) throw new Error("User id missing.");
         const { db } = await connectToDatabase();
-        const collection = db.collection('cards');
+        const collection = db.collection("projects");
         const data = await collection
-            .find(query)
+            .find(
+                (projectId)
+                    ? { "$and": [{ _id: { "$eq": new ObjectId(projectId) } }, { user_id: { "$eq": (userId instanceof ObjectId) ? userId : new ObjectId(userId) } }] }
+                    : { user_id: (userId instanceof ObjectId) ? userId : new ObjectId(userId) }
+            )
             .limit(QUERY_RESULT_LIMIT)
-            .toArray();
-        return serialize(data, ["_id", "project_id"]);
+            .toArray()
+        return serialize(data);
     } catch (err) {
-        console.error(err);
+        console.error("Error while fetching projects: ", err);
     }
 }
 
 export async function addProject(formData: any) {
     if (!formData.get("projectName")) throw new Error("Missing input with name='projectName'");
 
+    const user = await fetchUserByEmail(formData.get("email"), false);
+
     const newProject: Project = {
         _id: new ObjectId(),
-        name: formData.get("projectName")
+        name: formData.get("projectName"),
+        user_id: user._id
     };
 
     var success: boolean = false;
@@ -88,7 +82,7 @@ export async function addProject(formData: any) {
         await collection.insertOne(newProject);
         success = true;
     } catch (err) {
-        console.error(err);
+        console.error("Error while adding project: ", err);
     } finally {
         (success)
             ? redirect(`/projects/${newProject._id}`, RedirectType.replace)
@@ -111,9 +105,34 @@ export async function deleteProject(projectId: string | ObjectId) {
             });
         success = true;
     } catch (err) {
-        console.error(err);
+        console.error("Error while deleting project", err);
     } finally {
         if (success) redirect("/", RedirectType.replace);
+    }
+}
+
+export async function fetchCards(fetchParams: { user_id: string, _id?: string, project_id?: string }) {
+    try {
+        //Serialize fetchParams properties into ObjectIds
+        let queryMap = new Map();
+        for (const [key, value] of Object.entries(fetchParams)) {
+            if (value) queryMap.set(key, new ObjectId(value));
+        }
+        const query = Object.fromEntries(queryMap);
+        const { db } = await connectToDatabase();
+        const collection = db.collection('cards');
+        const data = await collection
+            .find({
+                "$and": [
+                    { user_id: { "$eq": new ObjectId(fetchParams.user_id) } },
+                    query
+                ]
+            })
+            .limit(QUERY_RESULT_LIMIT)
+            .toArray();
+        return serialize(data);
+    } catch (err) {
+        console.error("Error while fetching cards: ", err);
     }
 }
 
@@ -133,7 +152,7 @@ export async function addCard(formData: any) {
             .insertOne(newCard)
         revalidatePath(`/projects/${newCard.project_id}`);
     } catch (err) {
-        console.error(err);
+        console.error("Error while adding card: ", err);
     }
 }
 
@@ -152,7 +171,7 @@ export async function deleteCard(cardId: string | ObjectId) {
             .deleteOne(query)
         revalidatePath(`/projects/${card.project_id}`)
     } catch (err) {
-        console.error(err);
+        console.error("Error while deleting card: ", err);
     }
 }
 
@@ -165,6 +184,43 @@ async function deleteAllCards() {
             .deleteMany({}));
 
     } catch (err) {
-        console.error(err);
+        console.error("Error while deleting all cards: ", err);
     }
+}
+
+export async function fetchUserByCredentials(credentials: Record<"email" | "password", string>, serialized: boolean = true) {
+    try {
+        const { email, password } = credentials;
+        const { db } = await connectToDatabase();
+        const user = await (db
+            .collection("users")
+            .findOne({
+                "$and": [
+                    { email: { "$eq": email } },
+                    { password: { "$eq": password } }
+                ]
+            }));
+        return (serialized) ? serialize([user])[0] : user;
+    } catch (err) {
+        console.error("Error while fetching user by credentials: ", err);
+    }
+}
+
+export async function fetchUserByEmail(email: string, serialized: boolean = true) {
+    try {
+        if (!email) throw new Error("E-mail missing.")
+        const { db } = await connectToDatabase();
+        const user = await (
+            db
+                .collection("users")
+                .findOne({ email: email })
+        )
+        return (serialized) ? serialize([user])[0] : user;
+    } catch (err) {
+        console.error("Error while fetching user by email: ", err);
+    }
+}
+
+export async function getSession() {
+    return await getServerSession(authOptions);
 }
