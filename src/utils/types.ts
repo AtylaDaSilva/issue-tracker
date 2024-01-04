@@ -9,6 +9,7 @@ export type Card = {
     _id: string | ObjectId,
     project_id: string | ObjectId,
     name: string,
+    status: "open" | "resolved" | "wontdo",
     priority: number | string,
     severity: number | string,
     list: string,

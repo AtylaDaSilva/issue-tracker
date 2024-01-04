@@ -7,8 +7,10 @@ import styles from "@/css/modules/styles.module.css";
 
 export default function Toolbar({ project }: { project: Project }) {
     const formFields: JSX.Element[] = [
-        <Form.Control name="project_id" type="text" required placeholder="projectId" hidden value={project._id as string} />,
-        <Form.Control name="user_id" type="text" required placeholder="userId" hidden value={project.user_id as string} />,
+        <Form.Control name="project_id" type="text" required hidden value={project._id as string} />,
+        <Form.Control name="user_id" type="text" required hidden value={project.user_id as string} />,
+        <Form.Control name="status" type="text" required hidden value="open" />,
+        <Form.Control name="first_opened_at" type="text" required hidden value={ new Date().toString()} />,
         <FloatingLabel
             label="Card Name"
             controlId="cardNameInput"

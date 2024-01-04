@@ -1,4 +1,5 @@
 export function capitalizeString(string: string) {
+    if (!string) return null;
     return string
         .replaceAll('_', ' ')
         .split(' ')

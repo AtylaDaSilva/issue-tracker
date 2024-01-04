@@ -188,6 +188,26 @@ async function deleteAllCards() {
     }
 }
 
+export async function resolveCard(formData: any) {
+    const status = formData.get("status");
+    if (!status) return null;
+    try {
+        const card_id = formData.get("_id");
+        const last_resolved = formData.get("last_resolved");
+        const { db } = await connectToDatabase();
+        await db
+            .collection("cards")
+            .updateOne(
+                { _id: (card_id instanceof ObjectId) ? card_id : new ObjectId(card_id) },
+                { "$set": { "status": status, "last_resolved": last_resolved } }
+            )
+        const project_id = formData.get("project_id") instanceof ObjectId ? formData.get("project_id").toStrin() : formData.get("project_id");
+        revalidatePath(`projects/${project_id}`);
+    } catch (err) {
+        console.error("Error while resolving card: ", err);
+    }
+}
+
 export async function fetchUserByCredentials(credentials: Record<"email" | "password", string>, serialized: boolean = true) {
     try {
         const { email, password } = credentials;
