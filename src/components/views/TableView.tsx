@@ -34,16 +34,42 @@ export default function TableView({ cards }: { cards: Card[] }) {
                                         triggerOptions={{
                                             tooltip: { title: `${card.status.toLowerCase() == "resolved" ? "Open" : "Resolve"} card`, placement: "left" }
                                         }}
+                                        modalOptions={{
+                                            headerText: "Resolve Card"
+                                        }}
                                         fields={[
-                                            <Form.Control name="_id" value={card._id as string} hidden />,
-                                            <Form.Control name="last_resolved" value={new Date().toString()} hidden />,
-                                            <Form.Control name="project_id" value={card.project_id as string} hidden/>,
-                                            <Form.Select name="status" aria-aria-label="Select card status">
-                                                <option value="">Select a status</option>
-                                                <option value="open">Open</option>
-                                                <option value="resolved">Resolved</option>
-                                                <option value="wont_do">Wont Do</option>
-                                            </Form.Select>
+                                            [
+                                                {
+                                                    type: "select",
+                                                    name: "status",
+                                                    options: [
+                                                        { label: "--Status--", value: "" },
+                                                        { label: "Open", value: "open" },
+                                                        { label: "Wont Do", value: "wont_do" },
+                                                        { label: "Resolved", value: "resolved", selected: true },
+                                                    ]
+                                                }
+                                            ],
+                                            [
+                                                {
+                                                    type: "text",
+                                                    name: "_id",
+                                                    value: card._id as string,
+                                                    hidden: true
+                                                },
+                                                {
+                                                    type: "text",
+                                                    name: "last_resolved",
+                                                    value: new Date().toString(),
+                                                    hidden: true
+                                                },
+                                                {
+                                                    type: "text",
+                                                    name: "project_id",
+                                                    value: card.project_id as string,
+                                                    hidden: true
+                                                }
+                                            ]
                                         ]}
                                         handleSubmit={resolveCard}
                                     />
@@ -52,7 +78,7 @@ export default function TableView({ cards }: { cards: Card[] }) {
                                     <ConfirmModal
                                         trigger={<i className="bi bi-trash3 fs-5 text-danger clickable"></i>}
                                         triggerOptions={{
-                                            tooltip: {title: `Delete '${card.name}'`, placement: "left"}
+                                            tooltip: { title: `Delete '${card.name}'`, placement: "left" }
                                         }}
                                         message="Are you sure you want to delete this card? This process can not be undone."
                                         params={card._id}

@@ -64,15 +64,17 @@ export async function fetchProjects(userId: string | ObjectId, projectId?: strin
 }
 
 export async function addProject(formData: any) {
-    if (!formData.get("projectName")) throw new Error("Missing input with name='projectName'");
+    let data = new Map();
+    data.set("_id", new ObjectId());
 
-    const user = await fetchUserByEmail(formData.get("email"), false);
+    for (const [key, value] of formData.entries()) {
+        data.set(
+            key,
+            (key.indexOf("_id") !== -1) ? new ObjectId(value) : value
+        );
+    }
 
-    const newProject: Project = {
-        _id: new ObjectId(),
-        name: formData.get("projectName"),
-        user_id: user._id
-    };
+    const newProject: Project = Object.fromEntries(data);
 
     var success: boolean = false;
 
@@ -82,7 +84,7 @@ export async function addProject(formData: any) {
         await collection.insertOne(newProject);
         success = true;
     } catch (err) {
-        console.error("Error while adding project: ", err);
+        console.error("Error while creating new project: ", err);
     } finally {
         (success)
             ? redirect(`/projects/${newProject._id}`, RedirectType.replace)
@@ -150,7 +152,7 @@ export async function addCard(formData: any) {
         await db
             .collection('cards')
             .insertOne(newCard)
-        revalidatePath(`/projects/${newCard.project_id}`);
+        revalidatePath(`/projects/${(newCard.project_id instanceof ObjectId) ? newCard.project_id.toString() : newCard.project_id}`);
     } catch (err) {
         console.error("Error while adding card: ", err);
     }

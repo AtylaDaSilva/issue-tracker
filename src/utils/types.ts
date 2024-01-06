@@ -43,7 +43,7 @@ export type PopoverType = {
 
 export type FormModal = {
     trigger: JSX.Element,
-    fields: JSX.Element[],
+    fields: ModalField[][],
     handleSubmit: (formData: any) => Promise<any>,
     triggerOptions?: {
         styles?: string,
@@ -56,6 +56,54 @@ export type FormModal = {
         footerButttonText?: string
     }
 }
+
+export type ModalField = {
+    accept?: string,
+    alt?: string,
+    autocapitalize?: string,
+    autocomplete?: string,
+    capture?: string,
+    checked?: boolean,
+    col?: number,
+    dirname?: string,
+    disabled?: boolean,
+    form?: string,
+    formaction?: string,
+    formenctype?: string,
+    formmethod?: string,
+    formnovalidate?: boolean,
+    formtarget?: string,
+    group?: any,
+    hidden?: boolean,
+    id?: string,
+    inline?: boolean,
+    inputGroupSize?: "sm" | "lg",
+    label?: string,
+    list?: string,
+    max?: number,
+    maxlength?: string,
+    min?: number,
+    minlength?: string,
+    multiple?: boolean,
+    name?: string,
+    pattern?: string,
+    placeholder?: string,
+    placement?: "right" | "left",
+    popovertarget?: string,
+    popovertargetaction?: string,
+    options?: SelectOptions[],
+    readonly?: boolean,
+    required?: boolean,
+    reverse?: boolean,
+    selectSize?: "sm" | "lg",
+    size?: number,
+    step?: number,
+    type: "text" | "email" | "password" | "number" | "date" | "textarea" | "select" | "radio" | "checkbox" | "inputgroup" | "range" | "switch",
+    value?: string
+    width?: number
+}
+
+export type SelectOptions = { label: string | number, value: string | number, selected?: boolean };
 
 export type ConfirmModal = {
     trigger: JSX.Element,
