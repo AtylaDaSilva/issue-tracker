@@ -17,7 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body data-bs-theme='dark'>
+      <body data-bs-theme='dark' className='content-layout'>
         <Sidebar />
         {children}
       </body>
