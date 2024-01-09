@@ -1,12 +1,12 @@
 import { deleteProject, addCard } from "@/utils/mongodb"
 import type { Project } from "@/utils/types"
-import { Container, Form, FloatingLabel } from "react-bootstrap"
+import { currentDateTime } from "@/utils/functions"
+import { Container } from "react-bootstrap"
 import FormModal from "../modals/FormModal"
 import ConfirmModal from "../modals/ConfirmModal"
 import styles from "@/css/modules/styles.module.css";
 
 export default function Toolbar({ project }: { project: Project }) {
-
     return (
         <Container fluid className="d-flex align-items-center justify-content-start">
             <div className={styles.projectNameContainer}>
@@ -24,7 +24,29 @@ export default function Toolbar({ project }: { project: Project }) {
                     }}
                     fields={[
                         [
-                            { type: "text", name: "name", placeholder: "Card Name", required: true, col: 8 },
+                            {
+                                type: "text",
+                                name: "name",
+                                placeholder: "Card Name",
+                                required: true,
+                                col: 12
+                            }
+                        ],
+                        [
+                            {
+                                type: "number",
+                                name: "priority",
+                                min: 1,
+                                max: 5,
+                                placeholder: "Priority",
+                                required: true
+                            },
+                            {
+                                type: "datetime-local",
+                                name: "due_date",
+                                placeholder: "Due Date",
+                                required: true
+                            },
                             {
                                 type: "select",
                                 name: "status",
@@ -36,21 +58,50 @@ export default function Toolbar({ project }: { project: Project }) {
                                     { label: "Wont Do", value: "wont_do" },
                                     { label: "Resolved", value: "resolved" },
                                 ]
+                            }
+                        ],
+                        [
+                            {
+                                type: "text",
+                                name: "list",
+                                placeholder: "List",
+                                required: true
                             },
+                            {
+                                type: "text",
+                                name: "labels",
+                                placeholder: "Labels",
+                                required: true
+                            },
+                            {
+                                type: "text",
+                                name: "members",
+                                placeholder: "Members",
+                                required: true
+                            }
                         ],
                         [
-                            { type: "number", name: "priority", min: 1, max: 5, placeholder: "Priority", required: true },
-                            { type: "number", name: "severity", min: 1, max: 5, placeholder: "Severity", required: true },
-                            { type: "date", name: "due_date", placeholder: "Due Date", required: true }
-                        ],
-                        [
-                            { type: "text", name: "list", placeholder: "List", required: true },
-                            { type: "text", name: "labels", placeholder: "Labels", required: true },
-                            { type: "text", name: "members", placeholder: "Members", required: true },
-                        ],
-                        [
-                            { type: "text", name: "project_id", value: project._id as string, required: true, hidden: true },
-                            { type: "text", name: "user_id", value: project.user_id as string, required: true, hidden: true }
+                            {
+                                type: "text",
+                                name: "project_id",
+                                value: project._id as string,
+                                required: true,
+                                hidden: true
+                            },
+                            {
+                                type: "text",
+                                name: "user_id",
+                                value: project.user_id as string,
+                                required: true,
+                                hidden: true
+                            },
+                            {
+                                type: "datetime-local",
+                                name: "created_at",
+                                value: currentDateTime(),
+                                required: true,
+                                hidden: true
+                            }
                         ]
                     ]}
                     handleSubmit={addCard}

@@ -13,8 +13,9 @@ export type Card = {
     priority: number | string,
     severity: number | string,
     list: string,
-    labels: string[]
-    members: string[]
+    labels: string[],
+    members: string[],
+    created_at: string,
     due_date: string
 }
 
@@ -98,7 +99,7 @@ export type ModalField = {
     selectSize?: "sm" | "lg",
     size?: number,
     step?: number,
-    type: "text" | "email" | "password" | "number" | "date" | "textarea" | "select" | "radio" | "checkbox" | "inputgroup" | "range" | "switch",
+    type: "text" | "email" | "password" | "number" | "date" | "time" | "datetime-local" | "textarea" | "select" | "radio" | "checkbox" | "inputgroup" | "range" | "switch",
     value?: string
     width?: number
 }

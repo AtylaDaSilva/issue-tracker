@@ -49,6 +49,8 @@ export default function FormModal({ trigger, fields, triggerOptions, modalOption
                                                             case "password":
                                                             case "number":
                                                             case "date":
+                                                            case "time":
+                                                            case "datetime-local":
                                                             case "textarea":
                                                             case "text":
                                                                 return (

@@ -1,7 +1,7 @@
 import { deleteCard, resolveCard } from "@/utils/mongodb";
 import type { Card } from "@/utils/types";
-import { formatDate, capitalizeString } from "@/utils/functions";
-import { Table, Form } from "react-bootstrap"
+import { formatDateTime, defaultClientDateTime, capitalizeString, currentDateTime } from "@/utils/functions";
+import { Table } from "react-bootstrap"
 import ConfirmModal from "../modals/ConfirmModal";
 import FormModal from "../modals/FormModal";
 
@@ -15,16 +15,16 @@ export default function TableView({ cards }: { cards: Card[] }) {
                     <th><i className="bi bi-trash3 fs-5"></i></th>
                     <th>Status</th>
                     <th>Priority</th>
-                    <th>Severity</th>
                     <th>List</th>
                     <th>Labels</th>
                     <th>Members</th>
+                    <th>Created</th>
                     <th>Due Date</th>
                 </tr>
             </thead>
             <tbody>
                 {
-                    cards.map(card => {
+                    cards.map((card: Card) => {
                         return (
                             <tr key={card._id as string}>
                                 <td>{card.name}</td>
@@ -55,18 +55,21 @@ export default function TableView({ cards }: { cards: Card[] }) {
                                                     type: "text",
                                                     name: "_id",
                                                     value: card._id as string,
+                                                    required: true,
                                                     hidden: true
                                                 },
                                                 {
-                                                    type: "text",
+                                                    type: "datetime-local",
                                                     name: "last_resolved",
-                                                    value: new Date().toString(),
+                                                    value: currentDateTime(),
+                                                    required: true,
                                                     hidden: true
                                                 },
                                                 {
                                                     type: "text",
                                                     name: "project_id",
                                                     value: card.project_id as string,
+                                                    required: true,
                                                     hidden: true
                                                 }
                                             ]
@@ -88,11 +91,11 @@ export default function TableView({ cards }: { cards: Card[] }) {
                                 </td>
                                 <td>{capitalizeString(card.status)}</td>
                                 <td>{card.priority}</td>
-                                <td>{card.severity}</td>
                                 <td>{card.list}</td>
                                 <td>{card.labels}</td>
                                 <td>{card.members}</td>
-                                <td>{formatDate(card.due_date)}</td>
+                                <td>{formatDateTime(card.created_at, defaultClientDateTime)}</td>
+                                <td>{formatDateTime(card.due_date, defaultClientDateTime)}</td>
                             </tr>
                         )
                     })
