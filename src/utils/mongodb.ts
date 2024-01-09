@@ -210,17 +210,15 @@ export async function resolveCard(formData: any) {
     }
 }
 
-export async function fetchUserByCredentials(credentials: Record<"email" | "password", string>, serialized: boolean = true) {
+export async function fetchUserByCredentials(credentials: Record<"email", string>, serialized: boolean = true) {
     try {
-        const { email, password } = credentials;
+        if (!credentials) throw new Error("Invalid/Missing credentials");
+        const { email } = credentials;
         const { db } = await connectToDatabase();
         const user = await (db
             .collection("users")
             .findOne({
-                "$and": [
-                    { email: { "$eq": email } },
-                    { password: { "$eq": password } }
-                ]
+                email: email
             }));
         return (serialized) ? serialize([user])[0] : user;
     } catch (err) {

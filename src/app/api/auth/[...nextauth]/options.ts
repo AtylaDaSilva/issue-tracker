@@ -1,6 +1,7 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { fetchUserByCredentials } from "@/utils/mongodb";
+import { hash, compareHash } from "@/utils/functions";
 
 export const authOptions: NextAuthOptions = {
     providers: [
@@ -12,11 +13,14 @@ export const authOptions: NextAuthOptions = {
             },
             authorize: async (credentials) => {
                 if (!credentials?.email || !credentials?.password) return null;
+                /*const passwordHash = await hash(credentials.password);
+                console.log(`Password: ${credentials.password} | Hash: ${passwordHash}`);*/
                 try {
                     const user = await fetchUserByCredentials(credentials);
+                    const hashMatches = await compareHash(credentials.password, user.password);
                     if (
                         user.email == credentials.email &&
-                        user.password && credentials?.password
+                        hashMatches
                     ) {
                         return user;
                     }

@@ -1,4 +1,5 @@
 import { format } from "date-fns";
+import bcrypt from "bcrypt";
 
 export const defaultClientDateTime = "dd/MM/yyyy HH:mm";
 export const defaultDatabseDateTime = "yyyy-MM-dd'T'HH:mm:ss";
@@ -30,4 +31,14 @@ export function currentDateTime(
     return (options?.formatToDatabase === undefined || options?.formatToDatabase === true)
         ? format(new Date().toString(), options?.pattern || defaultDatabseDateTime)
         : new Date().toString();
+}
+
+export async function hash(password: string) {
+    if (!password) return null;
+    const salt = await bcrypt.genSaltSync(parseInt(process.env.SALT_ROUNDS as string));
+    return await bcrypt.hashSync(password, salt);
+}
+
+export async function compareHash(password: string, hash: string) {
+    return await bcrypt.compareSync(password, hash);
 }
