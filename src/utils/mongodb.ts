@@ -1,6 +1,6 @@
 "use server"
 import { MongoClient, ObjectId } from "mongodb";
-import type { MongoDBConnection, Project, Card } from "./types";
+import type { MongoDBConnection, Project, Card, List } from "./types";
 import { redirect, RedirectType } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth/next";
@@ -41,6 +41,45 @@ function serialize(mongoQueryResult: Array<any>): any {
         })
     } catch (err) {
         console.error("Error while serializing data: ", err);
+    }
+}
+
+/**Extracts all data from a formData (@see https://developer.mozilla.org/en-US/docs/Web/API/FormData) and returns an object
+ * @param formData A javascript object implementint the formData interface
+ * @param options.parseObjectIds Boolean. If true, parses any ObjectId strings into ObjectId
+*/
+function extractFormData(
+    formData: any,
+    options: { parseObjectIds: boolean } = { parseObjectIds: true }
+): object {
+    let data = new Map();
+    for (const [key, value] of formData.entries()) {
+        data.set(key, value);
+    }
+    const result = Object.fromEntries(data.entries());
+    return (options?.parseObjectIds)
+        ? parseObjectIds(result)
+        : result
+}
+
+/**Receives an object and parses any ObjectId strings into ObjectId.
+ * @param object A standard javascript object
+ * @return New object
+ */
+function parseObjectIds(object: any) {
+    try {
+        let data = new Map();
+        for (const [key, value] of Object.entries(object)) {
+            data.set(
+                key,
+                (key.indexOf("_id") !== -1)
+                    ? new ObjectId(value as string)
+                    : value
+            )
+        }
+        return Object.fromEntries(data.entries());
+    } catch (err) {
+        console.error("Error while parsing ObjectIds => ", err);
     }
 }
 
@@ -207,6 +246,46 @@ export async function resolveCard(formData: any) {
         revalidatePath(`projects/${project_id}`);
     } catch (err) {
         console.error("Error while resolving card: ", err);
+    }
+}
+
+export async function createList(formData: any) {
+    try {
+        const newList = extractFormData(formData);
+        const { db } = await connectToDatabase();
+        await db
+            .collection("lists")
+            .insertOne(newList);
+    } catch (err) {
+        console.error("Error while creating new list => ", err);
+    }
+}
+
+export async function fetchLists(query: List) {
+    try {
+        if (!query.user_id) throw new Error("Missing/Invalid user_id")
+        const parsedQuery = parseObjectIds(query);
+        const { db } = await connectToDatabase();
+        const data = await db
+            .collection("lists")
+            .find(parsedQuery)
+            .limit(QUERY_RESULT_LIMIT)
+            .toArray();
+        return serialize(data);
+    } catch (err) {
+        console.error("Error while fecthing lists => ", err);
+    }
+}
+
+export async function deleteList(query: List) {
+    try {
+        const parsedQuery = parseObjectIds(query);
+        const { db } = await connectToDatabase();
+        await db
+            .collection("lists")
+            .deleteOne(parsedQuery);
+    } catch (err) {
+        console.error("Error while deleting lists => ", err);
     }
 }
 

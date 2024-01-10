@@ -25,6 +25,24 @@ export type Project = {
     user_id: string | ObjectId
 }
 
+export type TriggerOptions = {
+    styles?: string,
+    tooltip?: TooltipType
+}
+
+export type ModalHeaderButton = {
+    trigger: JSX.Element
+}
+
+export type ModalOptions = {
+    size?: "sm" | "lg" | "xl",
+    centered?: boolean,
+    modalTitle?: string,
+    footerButttonText?: string,
+    refreshRouterOnSubmit?: boolean,
+    headerButtons?: ModalHeaderButton[]
+}
+
 export type TooltipType = {
     id?: string,
     placement: "top" | "bottom" | "left" | "right",
@@ -46,16 +64,8 @@ export type FormModal = {
     trigger: JSX.Element,
     fields: ModalField[][],
     handleSubmit: (formData: any) => Promise<any>,
-    triggerOptions?: {
-        styles?: string,
-        tooltip?: TooltipType
-    }
-    modalOptions?: {
-        size?: "sm" | "lg" | "xl"
-        centered?: boolean,
-        headerText?: string,
-        footerButttonText?: string
-    }
+    triggerOptions?: TriggerOptions,
+    modalOptions?: ModalOptions
 }
 
 export type ModalField = {
@@ -111,15 +121,8 @@ export type ConfirmModal = {
     message: string,
     params?: any,
     handleSubmit: (params: any | undefined) => Promise<void>,
-    triggerOptions?: {
-        styles?: string,
-        tooltip?: TooltipType
-    },
-    modalOptions?: {
-        size?: "sm" | "lg" | "xl",
-        centered?: boolean,
-        modalTitle?: string
-    }
+    triggerOptions?: TriggerOptions,
+    modalOptions?: ModalOptions
 }
 
 export type ProjectIcon = {
@@ -136,4 +139,20 @@ export type Avatar = {
         image?: string | null
     },
     styles?: string
+}
+
+export type List = {
+    _id?: string | ObjectId,
+    user_id?: string | ObjectId
+    name?: string,
+}
+
+export type TableModal = {
+    trigger: JSX.Element,
+    triggerOptions: TriggerOptions,
+    modalOptions?: ModalOptions,
+    tableData: {
+        header: any[][]
+        body: any[][]
+    }
 }

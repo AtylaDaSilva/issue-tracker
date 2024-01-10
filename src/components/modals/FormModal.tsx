@@ -4,8 +4,10 @@ import { useState } from "react"
 import BSTooltip from "../tooltips/BSTooltip"
 import type { FormModal, ModalField } from "@/utils/types"
 import { nanoid } from "nanoid"
+import { useRouter } from "next/navigation"
 
 export default function FormModal({ trigger, fields, triggerOptions, modalOptions, handleSubmit }: FormModal) {
+    const router = useRouter();
     const [showModal, setShowModal] = useState(false);
     trigger.props.className = `${trigger.props.className} ${triggerOptions?.styles}`;
     trigger.props.onClick = () => setShowModal(true);
@@ -28,12 +30,15 @@ export default function FormModal({ trigger, fields, triggerOptions, modalOption
             >
                 <Modal.Header closeButton onHide={() => setShowModal(false)}>
                     <Modal.Title id="contained-modal-title-vcenter">
-                        <h4>{modalOptions?.headerText || "Form Modal"}</h4>
+                        <h4>{modalOptions?.modalTitle || "Form Modal"}</h4>
                     </Modal.Title>
                 </Modal.Header>
                 <Form action={async (formData) => {
                     await handleSubmit(formData);
                     setShowModal(false);
+                    if (modalOptions?.refreshRouterOnSubmit) {
+                        router.refresh();
+                    }
                 }}>
                     <Modal.Body>
                         <Container fluid>

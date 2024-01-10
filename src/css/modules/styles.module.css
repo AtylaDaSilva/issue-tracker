@@ -47,6 +47,31 @@
     margin: 8px 0px;
 }
 
+.listButton {
+    font-size: var(--default-icon-size);
+    margin: 0px 2px 3px 0px;
+    color: var(--bs-white);
+    cursor: pointer;
+    transition: color var(--default-transition-time);
+}
+
+.listButton:hover {
+    color: var(--bs-success);
+    transition: color var(--default-transition-time);
+}
+
+.addListModalButton {
+    color: var(--bs-success);
+    cursor: pointer;
+    font-size: var(--default-icon-size);
+    transition: color var(--default-transition-time);
+}
+
+.addListModalButton:hover {
+    color: var(--bs-success-text-emphasis);
+    transition: color var(--default-transition-time);
+}
+
 .Avatar {
     cursor: pointer;
     height: 50px;

@@ -2,10 +2,12 @@
 import type { ConfirmModal } from "@/utils/types";
 import BSTooltip from "../tooltips/BSTooltip";
 import { Modal, Button } from "react-bootstrap"
+import { useRouter } from "next/navigation";
 import { useState } from "react"
 import { nanoid } from "nanoid";
 
 export default function ConfirmModal({ trigger, message, params, triggerOptions, modalOptions, handleSubmit }: ConfirmModal) {
+    const router = useRouter();
     const [showModal, setShowModal] = useState(false);
     trigger.props.onClick = () => setShowModal(true);
     trigger.props.className = `${trigger.props.className} ${triggerOptions?.styles}`
@@ -36,6 +38,9 @@ export default function ConfirmModal({ trigger, message, params, triggerOptions,
                     <Button variant="primary" onClick={async () => {
                         await handleSubmit(params);
                         setShowModal(false);
+                        if (modalOptions?.refreshRouterOnSubmit) {
+                            router.refresh();
+                        }
                     }}>Confirm</Button>
                 </Modal.Footer>
             </Modal>
