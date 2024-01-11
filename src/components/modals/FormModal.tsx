@@ -212,7 +212,7 @@ export default function FormModal({ trigger, fields, triggerOptions, modalOption
                                                                 throw new Error(`Field of type '${field.type}' is not suppported in ConfirmModal.`);
                                                         }
                                                     } catch (err) {
-                                                        console.log("Error while rendering modal fields => ", err);
+                                                        console.error("Error while rendering modal fields => ", err);
                                                     }
                                                 })
                                             }

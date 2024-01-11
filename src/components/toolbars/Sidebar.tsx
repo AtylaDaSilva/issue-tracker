@@ -42,11 +42,11 @@ export default async function Sidebar() {
                             { type: "text", name: "name", placeholder: "Project Name",  col: 12 }
                         ]
                     ]}
-                    triggerOptions={{ styles: styles.addProject, tooltip: { title: "Add Project", placement: "right" } }}
+                    triggerOptions={{ styles: styles.addProject, tooltip: { title: "Create Project", placement: "right" } }}
                     modalOptions={{
                         size: "sm",
-                        headerText: "New Project",
-                        footerButttonText: "Add Project"
+                        modalTitle: "New Project",
+                        footerButttonText: "Create Project"
                     }}
                 />
                 {projects}

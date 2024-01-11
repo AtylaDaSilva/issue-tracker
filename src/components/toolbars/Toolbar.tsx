@@ -1,5 +1,5 @@
-import { deleteProject, addCard, createList, fetchLists, deleteList } from "@/utils/mongodb";
-import type { Project, List, SelectOptions } from "@/utils/types";
+import { deleteProject, addCard, createList, fetchLists, deleteList, createLabel, fetchLabels, deleteLabel } from "@/utils/mongodb";
+import type { Project, List, Label, SelectOptions } from "@/utils/types";
 import { currentDateTime } from "@/utils/functions";
 import { Container } from "react-bootstrap";
 import FormModal from "../modals/FormModal";
@@ -12,11 +12,19 @@ export default async function Toolbar({ project }: { project: Project }) {
     const listSelectOptions: SelectOptions[] = lists.map((list: List) => {
         const option: SelectOptions = {
             label: list.name as string,
-            value: list._id as string
+            value: JSON.stringify(list)
         }
         return option;
     })
 
+    const labels: Label[] = await fetchLabels({ user_id: project.user_id });
+    const labelSelectOptions: SelectOptions[] = labels.map((label: Label) => {
+        const option: SelectOptions = {
+            label: label.name as string,
+            value: JSON.stringify(label)
+        }
+        return option;
+    })
     return (
         <Container fluid className="d-flex align-items-center justify-content-start">
             <div className={styles.projectNameContainer}>
@@ -39,7 +47,20 @@ export default async function Toolbar({ project }: { project: Project }) {
                                 name: "name",
                                 placeholder: "Card Name",
                                 required: true,
-                                col: 12
+                                col: 8
+                            },
+                            {
+                                type: "select",
+                                name: "status",
+                                placeholder: "Status",
+                                required: true,
+                                col: 4,
+                                options: [
+                                    { label: "--Status--", value: "" },
+                                    { label: "Open", value: "open", selected: true },
+                                    { label: "Wont Do", value: "wont_do" },
+                                    { label: "Resolved", value: "resolved" },
+                                ]
                             }
                         ],
                         [
@@ -48,7 +69,7 @@ export default async function Toolbar({ project }: { project: Project }) {
                                 name: "priority",
                                 min: 1,
                                 max: 5,
-                                placeholder: "Priority",
+                                placeholder: "Priority (1-5)",
                                 required: true
                             },
                             {
@@ -56,18 +77,6 @@ export default async function Toolbar({ project }: { project: Project }) {
                                 name: "due_date",
                                 placeholder: "Due Date",
                                 required: true
-                            },
-                            {
-                                type: "select",
-                                name: "status",
-                                placeholder: "Status",
-                                required: true,
-                                options: [
-                                    { label: "--Status--", value: "" },
-                                    { label: "Open", value: "open", selected: true },
-                                    { label: "Wont Do", value: "wont_do" },
-                                    { label: "Resolved", value: "resolved" },
-                                ]
                             }
                         ],
                         [
@@ -86,16 +95,18 @@ export default async function Toolbar({ project }: { project: Project }) {
                                 required: true
                             },
                             {
-                                type: "text",
+                                type: "select",
                                 name: "labels",
                                 placeholder: "Labels",
-                                required: true
-                            },
-                            {
-                                type: "text",
-                                name: "members",
-                                placeholder: "Members",
-                                required: true
+                                required: true,
+                                options: [
+                                    {
+                                        label: "Select a Label",
+                                        value: "",
+                                        selected: true
+                                    },
+                                    ...labelSelectOptions
+                                ]
                             }
                         ],
                         [
@@ -154,6 +165,7 @@ export default async function Toolbar({ project }: { project: Project }) {
                                                 {
                                                     type: "text",
                                                     name: "name",
+                                                    placeholder: "List Name",
                                                     required: true,
                                                     col: 12
                                                 },
@@ -175,28 +187,119 @@ export default async function Toolbar({ project }: { project: Project }) {
                     tableData={{
                         header: [
                             [
-                                "#", "List Name",
-                                <i className="bi bi-trash3 fs-6"></i>
+                                { data: "#", styles: { width: "5%" } },
+                                { data: "List Name", styles: { width: "90%" } },
+                                { data: <i className="bi bi-trash3 fs-6"></i>, styles: { width: "5%" } }
                             ]
                         ],
                         body: lists.map((list: List, listIndex) => {
                             return [
-                                listIndex + 1,
-                                list.name,
-                                <ConfirmModal
-                                    trigger={<i className="bi bi-trash3 fs-6 text-danger clickable"></i>}
-                                    triggerOptions={{
-                                        tooltip: { title: `Delete ${list.name}`, placement: "right" }
-                                    }}
-                                    message="Are you sure you want to delete this List? This process can not be undone."
-                                    params={{ "_id": list._id }}
-                                    handleSubmit={deleteList}
-                                    modalOptions={{
-                                        centered: true,
-                                        modalTitle: "Delete List",
-                                        refreshRouterOnSubmit: true
-                                    }}
-                                />
+                                { data: listIndex + 1, styles: { width: "5%" } },
+                                { data: list.name, styles: { width: "90%" } },
+                                {
+                                    data: (
+                                        <ConfirmModal
+                                            trigger={<i className="bi bi-trash3 fs-6 text-danger clickable"></i>}
+                                            triggerOptions={{
+                                                tooltip: { title: `Delete '${list.name}'`, placement: "left" }
+                                            }}
+                                            message="Are you sure you want to delete this List? This process can not be undone."
+                                            params={{ "_id": list._id }}
+                                            handleSubmit={deleteList}
+                                            modalOptions={{
+                                                centered: true,
+                                                modalTitle: "Delete List",
+                                                refreshRouterOnSubmit: true
+                                            }}
+                                        />
+                                    ),
+                                    styles: { width: "5%" }
+                                }
+                            ]
+                        })
+                    }}
+                />
+                <TableModal
+                    trigger={<i className="bi bi-tags"></i>}
+                    triggerOptions={{
+                        tooltip: { title: "Labels", placement: "bottom" },
+                        styles: styles.labelsButton
+                    }}
+                    modalOptions={{
+                        size: "lg",
+                        centered: true,
+                        modalTitle: "Labels",
+                        refreshRouterOnSubmit: true,
+                        headerButtons: [
+                            {
+                                trigger: (
+                                    <FormModal
+                                        trigger={<i className={`bi bi-plus-lg`}></i>}
+                                        triggerOptions={{
+                                            tooltip: { title: "New Label", placement: "bottom" },
+                                            styles: styles.addLabelModalButton
+                                        }}
+                                        modalOptions={{
+                                            size: "sm",
+                                            centered: true,
+                                            modalTitle: "New Label",
+                                            refreshRouterOnSubmit: true
+                                        }}
+                                        fields={[
+                                            [
+                                                {
+                                                    type: "text",
+                                                    name: "name",
+                                                    placeholder: "Label Name",
+                                                    required: true,
+                                                    col: 12
+                                                },
+                                                {
+                                                    type: "text",
+                                                    name: "user_id",
+                                                    value: project.user_id as string,
+                                                    hidden: true,
+                                                    required: true
+                                                }
+                                            ]
+                                        ]}
+                                        handleSubmit={createLabel}
+                                    />
+                                )
+                            }
+                        ]
+                    }}
+                    tableData={{
+                        header: [
+                            [
+                                { data: "#", styles: { width: "5%" } },
+                                { data: "Label Name", styles: { width: "90%" } },
+                                { data: <i className="bi bi-trash3 fs-6"></i>, styles: { width: "5%" } }
+                            ]
+                        ],
+                        body: labels.map((label: Label, labelIndex) => {
+                            return [
+                                { data: labelIndex + 1, styles: { width: "5%" } },
+                                { data: label.name, styles: { width: "90%" } },
+                                {
+                                    data: (
+                                        <ConfirmModal
+                                            trigger={<i className="bi bi-trash3 fs-6 text-danger clickable"></i>}
+                                            triggerOptions={{
+                                                tooltip: { title: `Delete '${label.name}'`, placement: "left" }
+                                            }}
+                                            message="Are you sure you want to delete this Label? This process can not be undone."
+                                            params={{ "_id": label._id }}
+                                            handleSubmit={deleteLabel}
+                                            modalOptions={{
+                                                centered: true,
+                                                modalTitle: "Delete List",
+                                                refreshRouterOnSubmit: true
+                                            }}
+                                        />
+                                    ),
+                                    styles: { width: "5%" }
+                                }
                             ]
                         })
                     }}

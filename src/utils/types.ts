@@ -1,4 +1,5 @@
 import { ObjectId, MongoClient } from 'mongodb';
+import { StyleHTMLAttributes } from 'react';
 
 export type MongoDBConnection = {
     client: MongoClient | null,
@@ -11,10 +12,8 @@ export type Card = {
     name: string,
     status: "open" | "resolved" | "wontdo",
     priority: number | string,
-    severity: number | string,
     list: string,
-    labels: string[],
-    members: string[],
+    labels: string,
     created_at: string,
     due_date: string
 }
@@ -147,12 +146,24 @@ export type List = {
     name?: string,
 }
 
+export type TableData = {
+    data: any,
+    styles?: any,
+    colSpan?: number
+}
+
 export type TableModal = {
     trigger: JSX.Element,
     triggerOptions: TriggerOptions,
     modalOptions?: ModalOptions,
     tableData: {
-        header: any[][]
-        body: any[][]
+        header: TableData[][]
+        body: TableData[][]
     }
+}
+
+export type Label = {
+    _id?: string | ObjectId,
+    user_id?: string | ObjectId,
+    name?: string
 }

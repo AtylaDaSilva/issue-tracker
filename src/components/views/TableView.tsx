@@ -17,7 +17,6 @@ export default function TableView({ cards }: { cards: Card[] }) {
                     <th>Priority</th>
                     <th>List</th>
                     <th>Labels</th>
-                    <th>Members</th>
                     <th>Created</th>
                     <th>Due Date</th>
                 </tr>
@@ -35,7 +34,7 @@ export default function TableView({ cards }: { cards: Card[] }) {
                                             tooltip: { title: `${card.status.toLowerCase() == "resolved" ? "Open" : "Resolve"} card`, placement: "left" }
                                         }}
                                         modalOptions={{
-                                            headerText: "Resolve Card"
+                                            modalTitle: "Resolve Card"
                                         }}
                                         fields={[
                                             [
@@ -91,9 +90,8 @@ export default function TableView({ cards }: { cards: Card[] }) {
                                 </td>
                                 <td>{capitalizeString(card.status)}</td>
                                 <td>{card.priority}</td>
-                                <td>{card.list}</td>
-                                <td>{card.labels}</td>
-                                <td>{card.members}</td>
+                                <td>{JSON.parse(card.list).name}</td>
+                                <td>{JSON.parse(card.labels).name}</td>
                                 <td>{formatDateTime(card.created_at, defaultClientDateTime)}</td>
                                 <td>{formatDateTime(card.due_date, defaultClientDateTime)}</td>
                             </tr>

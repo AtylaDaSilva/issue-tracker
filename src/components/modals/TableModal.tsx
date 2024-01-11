@@ -3,7 +3,7 @@ import { useState } from "react";
 import { nanoid } from "nanoid";
 import { Modal, Table } from "react-bootstrap";
 import BSTooltip from "../tooltips/BSTooltip";
-import type { TableModal, ModalHeaderButton } from "@/utils/types";
+import type { TableModal, TableData, ModalHeaderButton } from "@/utils/types";
 
 export default function TableModal({ trigger, triggerOptions, modalOptions, tableData }: TableModal) {
     const modalId = `table-modal-${nanoid()}`;
@@ -41,12 +41,22 @@ export default function TableModal({ trigger, triggerOptions, modalOptions, tabl
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Table striped hover bordered>
+                    <Table striped hover bordered className="w-100">
                         <thead>
                             {tableData.header.map(row => {
                                 return (
                                     <tr key={nanoid()}>
-                                        { row.map(data => <th key={nanoid()}>{data}</th>) }
+                                        {row.map((tableData: TableData) => {
+                                            return (
+                                                <th
+                                                    key={nanoid()}
+                                                    colSpan={tableData.colSpan || 1}
+                                                    style={tableData.styles}
+                                                >
+                                                    {tableData.data}
+                                                </th>
+                                            );
+                                        }) }
                                     </tr>
                                 )
                             })}
@@ -55,7 +65,17 @@ export default function TableModal({ trigger, triggerOptions, modalOptions, tabl
                             {tableData.body.map(row => {
                                 return (
                                     <tr key={nanoid()}>
-                                        {row.map(data => <td key={nanoid()}>{data}</td>) }
+                                        {row.map(tableData => {
+                                            return (
+                                                <td
+                                                    key={nanoid()}
+                                                    colSpan={tableData.colSpan || 1}
+                                                    style={tableData.styles}
+                                                >
+                                                    {tableData.data}
+                                                </td>
+                                            );
+                                        }) }
                                     </tr>
                                 )
                             })}

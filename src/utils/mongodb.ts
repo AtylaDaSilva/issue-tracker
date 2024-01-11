@@ -1,6 +1,6 @@
 "use server"
 import { MongoClient, ObjectId } from "mongodb";
-import type { MongoDBConnection, Project, Card, List } from "./types";
+import type { MongoDBConnection, Project, Card, List, Label } from "./types";
 import { redirect, RedirectType } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth/next";
@@ -103,20 +103,8 @@ export async function fetchProjects(userId: string | ObjectId, projectId?: strin
 }
 
 export async function addProject(formData: any) {
-    let data = new Map();
-    data.set("_id", new ObjectId());
-
-    for (const [key, value] of formData.entries()) {
-        data.set(
-            key,
-            (key.indexOf("_id") !== -1) ? new ObjectId(value) : value
-        );
-    }
-
-    const newProject: Project = Object.fromEntries(data);
-
+    const newProject: Project = extractFormData(formData) as Project
     var success: boolean = false;
-
     try {
         const { db } = await connectToDatabase();
         const collection = db.collection('projects');
@@ -179,14 +167,7 @@ export async function fetchCards(fetchParams: { user_id: string, _id?: string, p
 
 export async function addCard(formData: any) {
     try {
-        let data = new Map();
-        for (const [key, value] of formData.entries()) {
-            data.set(
-                key,
-                (key.indexOf("_id") !== -1) ? new ObjectId(value) : value
-            );
-        }
-        const newCard: Card = Object.fromEntries(data);
+        const newCard: Card = extractFormData(formData) as Card;
         const { db } = await connectToDatabase();
         await db
             .collection('cards')
@@ -286,6 +267,46 @@ export async function deleteList(query: List) {
             .deleteOne(parsedQuery);
     } catch (err) {
         console.error("Error while deleting lists => ", err);
+    }
+}
+
+export async function createLabel(formData: any) {
+    try {
+        const newLabel = extractFormData(formData);
+        const { db } = await connectToDatabase();
+        await db
+            .collection("labels")
+            .insertOne(newLabel);
+    } catch (err) {
+        console.error("Error while creating label => ", err);
+    }
+}
+
+export async function fetchLabels(query: Label) {
+    try {
+        if (!query.user_id) throw new Error("Missing/Invalid user_id");
+        const parsedQuery = parseObjectIds(query);
+        const { db } = await connectToDatabase();
+        const data = await db
+            .collection("labels")
+            .find(parsedQuery)
+            .limit(QUERY_RESULT_LIMIT)
+            .toArray();
+        return serialize(data);
+    } catch (err) {
+        console.error("Error while fetching labels => ", err);
+    }
+}
+
+export async function deleteLabel(query: Label) {
+    try {
+        const parsedQuery = parseObjectIds(query);
+        const { db } = await connectToDatabase();
+        await db
+            .collection("labels")
+            .deleteOne(parsedQuery);
+    } catch (err) { 
+        console.error("Error while deleting label => ", err);
     }
 }
 
