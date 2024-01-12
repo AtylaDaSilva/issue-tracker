@@ -75,8 +75,6 @@ export default function FormModal({ trigger, fields, triggerOptions, modalOption
                                                                                 value={field.value}
                                                                                 hidden={(field.hidden !== undefined) ? field.hidden : false}
                                                                                 placeholder={field.placeholder}
-                                                                                min={field.min}
-                                                                                max={field.max}
                                                                                 readOnly={field.readonly}
                                                                                 disabled={field.disabled}
                                                                                 required={field.required}
