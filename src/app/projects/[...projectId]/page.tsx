@@ -13,7 +13,7 @@ export default async function Project({ params }: { params: { projectId: string 
         <Container fluid className='main-container d-flex flex-column'>
             <Row>
                 <Col>
-                    { <Toolbar project={project[0]} /> }
+                    {<Toolbar project={project[0]} />}
                 </Col>
             </Row>
             <Row className='flex-grow-1'>
